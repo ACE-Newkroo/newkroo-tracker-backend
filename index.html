@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NewKroo — Advisory Workstream Plan</title>
+<style>
+:root {
+  --navy: #0f1f3d;
+  --teal: #1a7f6e;
+  --teal-light: #e8f5f2;
+  --teal-mid: #2db09a;
+  --amber: #c97d0a;
+  --amber-light: #fef3e0;
+  --coral: #c84b2f;
+  --coral-light: #fceee9;
+  --purple: #5c4aab;
+  --purple-light: #eeedfb;
+  --blue: #1a5fa8;
+  --blue-light: #e6f0fb;
+  --green: #3a6e1a;
+  --green-light: #eaf2e0;
+  --pink: #9c2f62;
+  --pink-light: #faeaf2;
+  --slate: #e8e6df;
+  --cream: #f7f5ef;
+  --ink: #1a1814;
+  --muted: #6b6860;
+  --border: rgba(15,31,61,0.11);
+  --shadow: 0 1px 4px rgba(15,31,61,0.08);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif; background:var(--cream); color:var(--ink); font-size:14px; line-height:1.6; }
+
+/* ── HEADER ── */
+.site-header { background:var(--navy); padding:2.5rem 3rem 2rem; position:relative; overflow:hidden; }
+.site-header::before { content:''; position:absolute; top:-80px; right:-80px; width:340px; height:340px; border-radius:50%; border:1px solid rgba(255,255,255,0.05); }
+.site-header::after  { content:''; position:absolute; bottom:-50px; right:100px; width:200px; height:200px; border-radius:50%; border:1px solid rgba(255,255,255,0.03); }
+.header-eyebrow { font-size:10.5px; font-weight:600; letter-spacing:0.13em; text-transform:uppercase; color:var(--teal-mid); margin-bottom:0.6rem; }
+.header-title { font-family:'DM Serif Display',Georgia,'Times New Roman',serif; font-size:2.4rem; color:#fff; line-height:1.15; margin-bottom:0.35rem; }
+.header-sub { font-size:13px; color:rgba(255,255,255,0.45); }
+.header-meta { margin-top:1.75rem; display:flex; gap:2rem; flex-wrap:wrap; }
+.meta-chip { font-size:12px; color:rgba(255,255,255,0.45); }
+.meta-chip strong { color:rgba(255,255,255,0.8); font-weight:500; }
+
+/* ── LEGEND ── */
+.legend-bar { background:var(--navy); border-top:1px solid rgba(255,255,255,0.07); padding:0.65rem 3rem; display:flex; gap:1.5rem; flex-wrap:wrap; align-items:center; }
+.leg-label { font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:rgba(255,255,255,0.3); margin-right:0.25rem; }
+.leg { display:flex; align-items:center; gap:6px; font-size:11.5px; color:rgba(255,255,255,0.6); }
+.leg-dot { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
+
+/* ── TABS ── */
+.tabs { background:#fff; border-bottom:1px solid var(--border); padding:0 3rem; display:flex; gap:0; overflow-x:auto; position:sticky; top:0; z-index:100; box-shadow:var(--shadow); }
+.tab { font-size:12.5px; font-weight:500; padding:0.85rem 1rem; border:none; background:none; color:var(--muted); cursor:pointer; border-bottom:2.5px solid transparent; transition:color 0.15s,border-color 0.15s; white-space:nowrap; display:flex; align-items:center; gap:6px; }
+.tab:hover { color:var(--ink); }
+.tab.active { color:var(--navy); border-bottom-color:var(--teal); }
+.tab-pip { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
+/* ── MAIN ── */
+.main { max-width:1260px; margin:0 auto; padding:2rem 3rem 4rem; }
+.ws-section { display:none; }
+.ws-section.visible { display:block; }
+
+/* ── WS INTRO ── */
+.ws-intro { display:flex; gap:1.25rem; align-items:flex-start; margin-bottom:1.75rem; padding-bottom:1.5rem; border-bottom:1px solid var(--border); }
+.ws-badge { font-size:10px; font-weight:700; letter-spacing:0.11em; text-transform:uppercase; padding:3px 10px; border-radius:3px; flex-shrink:0; margin-top:5px; }
+.ws-intro-text h2 { font-family:'DM Serif Display',Georgia,'Times New Roman',serif; font-size:1.5rem; color:var(--navy); font-weight:400; margin-bottom:0.3rem; }
+.ws-intro-text p  { font-size:13px; color:var(--muted); max-width:680px; line-height:1.65; }
+
+/* ── GANTT TABLE ── */
+.gantt-wrap { background:#fff; border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:2rem; box-shadow:var(--shadow); }
+.gantt-head { display:grid; padding:0.55rem 1rem; background:var(--navy); font-size:10px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:rgba(255,255,255,0.45); }
+.gantt-row  { display:grid; border-top:1px solid var(--border); min-height:50px; align-items:center; transition:background 0.1s; }
+.gantt-row:nth-child(even) { background:rgba(15,31,61,0.016); }
+.gantt-row:hover { background:rgba(26,127,110,0.04); }
+.g-label  { padding:0.55rem 1rem; font-size:13px; color:var(--ink); line-height:1.4; }
+.g-owner  { padding:0.55rem 0.5rem; font-size:11.5px; color:var(--muted); line-height:1.4; }
+.g-due    { padding:0.55rem 0.5rem; font-size:11.5px; color:var(--muted); }
+.g-bars   { padding:0.55rem 0.5rem; }
+
+/* bar track */
+.bar-track { display:flex; width:100%; position:relative; height:20px; }
+.mc { flex:1; border-right:1px solid rgba(15,31,61,0.06); height:100%; }
+.mc:last-child { border-right:none; }
+.bar {
+  position:absolute; top:2px; height:16px; border-radius:3px;
+  font-size:9.5px; font-weight:700; letter-spacing:0.04em;
+  display:flex; align-items:center; padding:0 6px;
+  white-space:nowrap; overflow:hidden;
+}
+.bar-now     { background:var(--coral); color:#fff; }
+.bar-may     { background:var(--amber); color:#fff; }
+.bar-june    { background:var(--teal);  color:#fff; }
+.bar-ongoing { background:var(--slate); color:var(--muted); border:1px solid rgba(15,31,61,0.13); }
+.bar-tbc     { background:rgba(15,31,61,0.07); color:var(--muted); border:1px dashed rgba(15,31,61,0.2); font-style:italic; }
+
+/* priority chips */
+.chip { display:inline-block; font-size:9.5px; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; padding:2px 7px; border-radius:3px; white-space:nowrap; }
+.chip-now     { background:var(--coral-light);  color:var(--coral); }
+.chip-may     { background:var(--amber-light);  color:var(--amber); }
+.chip-june    { background:var(--teal-light);   color:var(--teal);  }
+.chip-ongoing { background:var(--slate);        color:var(--muted); }
+.chip-tbc     { background:rgba(15,31,61,0.06); color:var(--muted); font-style:italic; }
+
+/* ── SLACK STATUS INDICATORS ── */
+.status-dot { display:inline-block; width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:4px; transition:background 0.3s; }
+.status-dot.complete   { background:#1a7f6e; }
+.status-dot.inprogress { background:#c97d0a; }
+.status-dot.blocked    { background:#c84b2f; }
+.status-dot.reset      { background:#b8b6af; border:1px solid rgba(15,31,61,0.15); }
+.status-dot.none       { background:transparent; border:1px dashed rgba(15,31,61,0.2); }
+.status-badge { display:inline-flex; align-items:center; gap:5px; font-size:10px; font-weight:600; letter-spacing:0.05em; padding:2px 8px; border-radius:3px; white-space:nowrap; margin-left:6px; }
+.status-badge.complete   { background:#e8f5f2; color:#0f5a4a; }
+.status-badge.inprogress { background:#fef3e0; color:#7a4800; }
+.status-badge.blocked    { background:#fceee9; color:#8c2e17; }
+.status-badge.reset      { background:#f0ede8; color:#6b6860; }
+.sync-bar { background:var(--navy); color:rgba(255,255,255,0.5); font-size:11px; padding:0.35rem 3rem; display:flex; align-items:center; gap:0.75rem; }
+.sync-dot { width:6px; height:6px; border-radius:50%; background:#1a7f6e; flex-shrink:0; }
+.sync-dot.live    { animation:pulse 2s infinite; }
+.sync-dot.error   { background:#c84b2f; }
+.sync-dot.pending { background:#c97d0a; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+.not-configured { background:#fef3e0; border:1px dashed #c97d0a; border-radius:6px; padding:0.75rem 1rem; font-size:12px; color:#5a3600; margin-bottom:1.5rem; line-height:1.6; }
+.not-configured code { font-family:monospace; font-size:11px; background:rgba(0,0,0,0.07); padding:1px 5px; border-radius:3px; }
+
+/* ── OVERVIEW ── */
+.ov-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:0.85rem; margin-bottom:2rem; }
+.ov-card { background:#fff; border:1px solid var(--border); border-radius:8px; padding:1.1rem 1.2rem; cursor:pointer; transition:border-color 0.15s,box-shadow 0.15s; box-shadow:var(--shadow); }
+.ov-card:hover { border-color:var(--teal); box-shadow:0 2px 12px rgba(26,127,110,0.1); }
+.ov-badge { font-size:9.5px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.4rem; }
+.ov-title { font-size:13px; font-weight:500; color:var(--navy); margin-bottom:0.5rem; line-height:1.3; }
+.ov-owner { font-size:11px; color:var(--muted); margin-bottom:0.5rem; }
+.ov-counts { display:flex; gap:0.6rem; flex-wrap:wrap; }
+.ov-c { font-size:10.5px; color:var(--muted); }
+.ov-c strong { color:var(--ink); font-weight:600; }
+
+/* master gantt */
+.master-gantt { background:#fff; border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:1.5rem; box-shadow:var(--shadow); }
+.mg-row { display:grid; grid-template-columns:180px 1fr; border-top:1px solid var(--border); min-height:38px; align-items:center; }
+.mg-row:first-child { border-top:none; }
+.mg-ws { padding:0.45rem 1rem; font-size:12px; font-weight:500; color:var(--navy); border-right:1px solid var(--border); display:flex; align-items:center; gap:7px; line-height:1.3; }
+.mg-pip { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
+.mg-bars { padding:0.45rem 0.75rem; }
+.mg-track { display:flex; width:100%; position:relative; height:16px; }
+.mg-mc { flex:1; height:100%; border-right:1px solid rgba(15,31,61,0.06); }
+.mg-mc:last-child { border-right:none; }
+.mg-bar { position:absolute; top:1px; height:14px; border-radius:2px; font-size:9px; font-weight:700; display:flex; align-items:center; padding:0 5px; white-space:nowrap; overflow:hidden; }
+
+.month-label-row { display:grid; grid-template-columns:180px 1fr; background:rgba(15,31,61,0.03); border-bottom:1px solid var(--border); }
+.ml-spacer { border-right:1px solid var(--border); }
+.ml-inner { display:flex; padding:0.3rem 0.75rem; }
+.ml-cell { flex:1; font-size:9.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:var(--muted); text-align:center; }
+
+/* callout boxes */
+.note-box { background:var(--teal-light); border-left:3px solid var(--teal); border-radius:0 6px 6px 0; padding:0.8rem 1rem; font-size:13px; color:#0d3a30; margin-bottom:1.5rem; line-height:1.6; }
+.flag-box { background:var(--coral-light); border-left:3px solid var(--coral); border-radius:0 6px 6px 0; padding:0.8rem 1rem; font-size:13px; color:#5a1e0e; margin-bottom:1.5rem; line-height:1.6; }
+.warn-box { background:var(--amber-light); border-left:3px solid var(--amber); border-radius:0 6px 6px 0; padding:0.8rem 1rem; font-size:13px; color:#5a3600; margin-bottom:1.5rem; line-height:1.6; }
+.section-label { font-size:10.5px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin:2rem 0 0.7rem; }
+
+/* col layouts */
+.cols-3-8 { grid-template-columns: 3fr 1.5fr 1fr 1fr 1fr 1fr 1fr 1fr; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-eyebrow">Advisory Workstream Plan · Confidential · April 2026</div>
+  <div class="header-title">NewKroo<br>Advisory Roadmap</div>
+  <div class="header-sub">All 11 areas of responsibility · Milestones · Owners · Deliverables</div>
+  <div class="header-meta">
+    <div class="meta-chip">Prepared <strong>April 2026</strong></div>
+    <div class="meta-chip">Advisor <strong>Anna</strong></div>
+    <div class="meta-chip">Phase 1 <strong>Live — imminent launch</strong></div>
+    <div class="meta-chip">Phase 1 close <strong>End May 2026</strong></div>
+  </div>
+</header>
+
+<div class="legend-bar">
+  <span class="leg-label">Priority</span>
+  <span class="leg"><span class="leg-dot" style="background:var(--coral)"></span>Immediate (now–Apr 30)</span>
+  <span class="leg"><span class="leg-dot" style="background:var(--amber)"></span>May</span>
+  <span class="leg"><span class="leg-dot" style="background:var(--teal)"></span>June–July</span>
+  <span class="leg"><span class="leg-dot" style="background:#b8b6af;border:1px solid rgba(15,31,61,0.15)"></span>Ongoing</span>
+  <span class="leg"><span class="leg-dot" style="background:rgba(15,31,61,0.1);border:1px dashed rgba(15,31,61,0.25)"></span>TBC / unassigned</span>
+</div>
+
+<div class="sync-bar" id="sync-bar">
+  <span class="sync-dot pending"></span>
+  <span id="sync-msg">Slack sync — paste your Render URL to activate</span>
+</div>
+
+<nav class="tabs" id="tab-nav">
+  <button class="tab active"   onclick="showTab('overview',this)">Overview</button>
+  <button class="tab" onclick="showTab('vision',this)">    <span class="tab-pip" style="background:#7f77dd"></span>Vision</button>
+  <button class="tab" onclick="showTab('bizcase',this)">  <span class="tab-pip" style="background:#185fa5"></span>Business Case</button>
+  <button class="tab" onclick="showTab('targetmkt',this)"><span class="tab-pip" style="background:#3a6e1a"></span>Target Market</button>
+  <button class="tab" onclick="showTab('governance',this)"><span class="tab-pip" style="background:#c84b2f"></span>Governance</button>
+  <button class="tab" onclick="showTab('technology',this)"><span class="tab-pip" style="background:#1a7f6e"></span>Technology</button>
+  <button class="tab" onclick="showTab('operations',this)"><span class="tab-pip" style="background:#9c2f62"></span>Operations</button>
+  <button class="tab" onclick="showTab('partners',this)"> <span class="tab-pip" style="background:#c97d0a"></span>Partner Mgmt</button>
+  <button class="tab" onclick="showTab('commercials',this)"><span class="tab-pip" style="background:#534ab7"></span>Commercials</button>
+  <button class="tab" onclick="showTab('product',this)">  <span class="tab-pip" style="background:#1a7f6e"></span>Product</button>
+  <button class="tab" onclick="showTab('marketing',this)"><span class="tab-pip" style="background:#c84b2f"></span>Marketing</button>
+  <button class="tab" onclick="showTab('odhr',this)">     <span class="tab-pip" style="background:#888780"></span>OD / HR</button>
+</nav>
+
+<main class="main">
+
+<!-- ════════════════════════════════════
+     OVERVIEW
+════════════════════════════════════ -->
+<section class="ws-section visible" id="ws-overview">
+
+  <div class="flag-box"><strong>Phase 1 is live.</strong> The content calendar's January launch window has passed — Phase 1 is reframed as imminent. WTC batch production, waitlist launch, and PCN outreach are the critical path items this week. Phase 1 closes end of May 2026.</div>
+
+  <div class="ov-grid">
+    <div class="ov-card" onclick="showTab('vision',   document.querySelector('[onclick*=vision]'))">
+      <div class="ov-badge" style="color:#534ab7">Vision</div>
+      <div class="ov-title">Vision</div>
+      <div class="ov-owner">Kelvin + Dai</div>
+      <div class="ov-counts"><span class="ov-c"><strong>1</strong> immediate</span><span class="ov-c"><strong>1</strong> ongoing</span></div>
+    </div>
+    <div class="ov-card" onclick="showTab('bizcase',  document.querySelector('[onclick*=bizcase]'))">
+      <div class="ov-badge" style="color:#185fa5">Business Case</div>
+      <div class="ov-title">Business Case</div>
+      <div class="ov-owner">Kelvin + Anna</div>
+      <div class="ov-counts"><span class="ov-c"><strong>2</strong> immediate</span><span class="ov-c"><strong>2</strong> May</span><span class="ov-c"><strong>1</strong> June–July</span></div>
+    </div>
+    <div class="ov-card" onclick="showTab('targetmkt',document.querySelector('[onclick*=targetmkt]'))">
+      <div class="ov-badge" style="color:#3a6e1a">Target Market</div>
+      <div class="ov-title">Target Market</div>
+      <div class="ov-owner">Raul + Anna</div>
+      <div class="ov-counts"><span class="ov-c"><strong>2</strong> immediate</span><span class="ov-c"><strong>2</strong> May</span><span class="ov-c"><strong>1</strong> June–July</span></div>
+    </div>
+    <div class="ov-card" onclick="showTab('governance',document.querySelector('[onclick*=governance]'))">
+      <div class="ov-badge" style="color:#c84b2f">Governance</div>
+      <div class="ov-title">Governance</div>
+      <div class="ov-owner">Kelvin + Dai</div>
+      <div class="ov-counts"><span class="ov-c"><strong>2</strong> immediate</span><span class="ov-c"><strong>2</strong> May</span><span class="ov-c"><strong>1</strong> June–July</span></div>
+    </div>
+    <div class="ov-card" onclick="showTab('technology',document.querySelector('[onclick*=technology]'))">
+      <div class="ov-badge" style="color:#1a7f6e">Technology</div>
+      <div class="ov-title">Technology</div>
+      <div class="ov-owner">Ian + Natan</div>
+      <div class="ov-counts"><span class="ov-c"><strong>3</strong> immediate</span><span class="ov-c"><strong>2</strong> May</span><span class="ov-c"><strong>1</strong> ongoing</span></div>
+    </div>
+    <div class="ov-card" onclick="showTab('operations',document.querySelector('[onclick*=operations]'))">
+      <div class="ov-badge" style="color:#9c2f62">Operations</div>
+      <div class="ov-title">Operations incl. Customer Service &amp; Concierge</div>
+      <div class="ov-owner">Yana / Kelvin + Anna (Concierge)</div>
+      <div class="ov-counts"><span class="ov-c"><strong>2</strong> immediate</span><span class="ov-c"><strong>2</strong> May</span><span class="ov-c"><strong>2</strong> ongoing</span></div>
+    </div>
+    <div class="ov-card" onclick="showTab('partners', document.querySelector('[onclick*=partners]'))">
+      <div class="ov-badge" style="color:#c97d0a">Partner Mgmt</div>
+      <div class="ov-title">Partner Management</div>
+      <div class="ov-owner">Raul</div>
+      <div class="ov-counts"><span class="ov-c"><strong>2</strong> immediate</span><span class="ov-c"><strong>2</strong> May</span><span class="ov-c"><strong>2</strong> June–July</span></div>
+    </div>
+    <div class="ov-card" onclick="showTab('commercials',document.querySelector('[onclick*=commercials]'))">
+      <div class="ov-badge" style="color:#534ab7">Commercials</div>
+      <div class="ov-title">Commercials</div>
+      <div class="ov-owner">Raul + Chris</div>
+      <div class="ov-counts"><span class="ov-c"><strong>1</strong> immediate</span><span class="ov-c"><strong>2</strong> May</span><span class="ov-c"><strong>2</strong> June–July</span></div>
+    </div>
+    <div class="ov-card" onclick="showTab('product',  document.querySelector('[onclick*=product]'))">
+      <div class="ov-badge" style="color:#1a7f6e">Product</div>
+      <div class="ov-title">Product</div>
+      <div class="ov-owner">Ian + Natan + Yana</div>
+      <div class="ov-counts"><span class="ov-c"><strong>2</strong> immediate</span><span class="ov-c"><strong>3</strong> May</span><span class="ov-c"><strong>1</strong> ongoing</span></div>
+    </div>
+    <div class="ov-card" onclick="showTab('marketing',document.querySelector('[onclick*=marketing]'))">
+      <div class="ov-badge" style="color:#c84b2f">Marketing</div>
+      <div class="ov-title">Marketing</div>
+      <div class="ov-owner">Anna (lead) + Mark</div>
+      <div class="ov-counts"><span class="ov-c"><strong>4</strong> immediate</span><span class="ov-c"><strong>4</strong> May</span><span class="ov-c"><strong>2</strong> June–July</span><span class="ov-c"><strong>2</strong> ongoing</span></div>
+    </div>
+    <div class="ov-card" onclick="showTab('odhr',     document.querySelector('[onclick*=odhr]'))">
+      <div class="ov-badge" style="color:#888780">OD / HR</div>
+      <div class="ov-title">OD / HR</div>
+      <div class="ov-owner" style="color:var(--coral);font-style:italic">TBC — unassigned</div>
+      <div class="ov-counts"><span class="ov-c"><strong>1</strong> immediate</span><span class="ov-c"><strong>2</strong> May</span><span class="ov-c"><strong>1</strong> June–July</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Master Gantt — All 11 Workstreams</div>
+  <div class="master-gantt">
+    <div class="month-label-row">
+      <div class="ml-spacer"></div>
+      <div class="ml-inner">
+        <div class="ml-cell">Now–Apr 30</div>
+        <div class="ml-cell">May</div>
+        <div class="ml-cell">June</div>
+        <div class="ml-cell">July</div>
+        <div class="ml-cell">Aug+</div>
+      </div>
+    </div>
+
+    <!-- Vision -->
+    <div class="mg-row">
+      <div class="mg-ws"><span class="mg-pip" style="background:#534ab7"></span>Vision</div>
+      <div class="mg-bars"><div class="mg-track">
+        <div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div>
+        <div class="mg-bar bar-now"  style="left:0;width:30%">North Star locked</div>
+        <div class="mg-bar bar-ongoing" style="left:30%;width:70%">Ongoing stewardship</div>
+      </div></div>
+    </div>
+    <!-- Business Case -->
+    <div class="mg-row">
+      <div class="mg-ws"><span class="mg-pip" style="background:#185fa5"></span>Business Case</div>
+      <div class="mg-bars"><div class="mg-track">
+        <div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div>
+        <div class="mg-bar bar-now"  style="left:0;width:20%">Assumptions</div>
+        <div class="mg-bar bar-may"  style="left:20%;width:20%">Model v1</div>
+        <div class="mg-bar bar-june" style="left:40%;width:20%">Investor deck</div>
+      </div></div>
+    </div>
+    <!-- Target Market -->
+    <div class="mg-row">
+      <div class="mg-ws"><span class="mg-pip" style="background:#3a6e1a"></span>Target Market</div>
+      <div class="mg-bars"><div class="mg-track">
+        <div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div>
+        <div class="mg-bar bar-now"  style="left:0;width:20%">Segment brief</div>
+        <div class="mg-bar bar-may"  style="left:20%;width:20%">Research</div>
+        <div class="mg-bar bar-june" style="left:40%;width:20%">NY analysis</div>
+      </div></div>
+    </div>
+    <!-- Governance -->
+    <div class="mg-row">
+      <div class="mg-ws"><span class="mg-pip" style="background:#c84b2f"></span>Governance</div>
+      <div class="mg-bars"><div class="mg-track">
+        <div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div>
+        <div class="mg-bar bar-now"  style="left:0;width:20%">Equity value</div>
+        <div class="mg-bar bar-may"  style="left:20%;width:20%">Legal structure</div>
+        <div class="mg-bar bar-june" style="left:40%;width:20%">Advisory board</div>
+      </div></div>
+    </div>
+    <!-- Technology -->
+    <div class="mg-row">
+      <div class="mg-ws"><span class="mg-pip" style="background:#1a7f6e"></span>Technology</div>
+      <div class="mg-bars"><div class="mg-track">
+        <div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div>
+        <div class="mg-bar bar-now"  style="left:0;width:20%">Waitlist + beta</div>
+        <div class="mg-bar bar-may"  style="left:20%;width:20%">Matching engine</div>
+        <div class="mg-bar bar-ongoing" style="left:40%;width:60%">Ongoing build</div>
+      </div></div>
+    </div>
+    <!-- Operations -->
+    <div class="mg-row">
+      <div class="mg-ws"><span class="mg-pip" style="background:#9c2f62"></span>Operations</div>
+      <div class="mg-bars"><div class="mg-track">
+        <div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div>
+        <div class="mg-bar bar-now"  style="left:0;width:20%">Playbooks</div>
+        <div class="mg-bar bar-may"  style="left:20%;width:20%">Concierge pilot</div>
+        <div class="mg-bar bar-ongoing" style="left:40%;width:60%">Ongoing ops</div>
+      </div></div>
+    </div>
+    <!-- Partner Mgmt -->
+    <div class="mg-row">
+      <div class="mg-ws"><span class="mg-pip" style="background:#c97d0a"></span>Partner Mgmt</div>
+      <div class="mg-bars"><div class="mg-track">
+        <div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div>
+        <div class="mg-bar bar-now"  style="left:0;width:20%">NHS + co-living</div>
+        <div class="mg-bar bar-may"  style="left:20%;width:20%">PCN outreach</div>
+        <div class="mg-bar bar-june" style="left:40%;width:40%">PCN signed + expansion</div>
+      </div></div>
+    </div>
+    <!-- Commercials -->
+    <div class="mg-row">
+      <div class="mg-ws"><span class="mg-pip" style="background:#534ab7"></span>Commercials</div>
+      <div class="mg-bars"><div class="mg-track">
+        <div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div>
+        <div class="mg-bar bar-now"  style="left:0;width:20%">Pricing decision</div>
+        <div class="mg-bar bar-may"  style="left:20%;width:20%">Revenue model</div>
+        <div class="mg-bar bar-june" style="left:40%;width:40%">Unit economics + fundraise</div>
+      </div></div>
+    </div>
+    <!-- Product -->
+    <div class="mg-row">
+      <div class="mg-ws"><span class="mg-pip" style="background:#1a7f6e"></span>Product</div>
+      <div class="mg-bars"><div class="mg-track">
+        <div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div>
+        <div class="mg-bar bar-now"  style="left:0;width:20%">MVP PRD gaps</div>
+        <div class="mg-bar bar-may"  style="left:20%;width:20%">90-day journey</div>
+        <div class="mg-bar bar-ongoing" style="left:40%;width:60%">Iterative build</div>
+      </div></div>
+    </div>
+    <!-- Marketing -->
+    <div class="mg-row">
+      <div class="mg-ws"><span class="mg-pip" style="background:#c84b2f"></span>Marketing</div>
+      <div class="mg-bars"><div class="mg-track">
+        <div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div>
+        <div class="mg-bar bar-now"  style="left:0;width:20%">WTC + waitlist</div>
+        <div class="mg-bar bar-may"  style="left:20%;width:20%">Paid social + LinkedIn</div>
+        <div class="mg-bar bar-ongoing" style="left:40%;width:60%">Full content machine</div>
+      </div></div>
+    </div>
+    <!-- OD/HR -->
+    <div class="mg-row">
+      <div class="mg-ws"><span class="mg-pip" style="background:#888780"></span>OD / HR</div>
+      <div class="mg-bars"><div class="mg-track">
+        <div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div><div class="mg-mc"></div>
+        <div class="mg-bar bar-tbc" style="left:0;width:100%">Owner TBC — assign before end April</div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="warn-box"><strong>OD/HR owner unassigned.</strong> This workstream has no named owner. An interim decision — even if it's Kelvin as a placeholder — should be made before end of April so the working agreement and hiring plan don't stall.</div>
+
+</section>
+
+<!-- ════════════════════════════════════
+     VISION
+════════════════════════════════════ -->
+<section class="ws-section" id="ws-vision">
+  <div class="ws-intro">
+    <span class="ws-badge" style="background:#eeedfb;color:#534ab7">Vision</span>
+    <div class="ws-intro-text">
+      <h2>Vision</h2>
+      <p>The North Star statement, founding thesis, and long-range product philosophy. Owned by the founders; Anna's advisory role is to pressure-test and ensure all other workstreams stay aligned to it.</p>
+    </div>
+  </div>
+  <div class="section-label">Gantt</div>
+  <div class="gantt-wrap">
+    <div class="gantt-head cols-3-8">
+      <div>Milestone</div><div>Owner</div><div>Priority</div><div>Now–Apr 30</div><div>May</div><div>June</div><div>July</div><div>Ongoing</div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">North Star statement confirmed and distributed to all workstream owners — "Making belonging possible again — when you're rebuilding"</div>
+      <div class="g-owner">Kelvin + Dai</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="mc"></div><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Vision reviewed at each phase gate — confirming all workstream decisions remain aligned to founding thesis</div>
+      <div class="g-owner">Kelvin + Dai</div>
+      <div class="g-due"><span class="chip chip-ongoing">Ongoing</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="mc"></div><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     BUSINESS CASE
+════════════════════════════════════ -->
+<section class="ws-section" id="ws-bizcase">
+  <div class="ws-intro">
+    <span class="ws-badge" style="background:#e6f0fb;color:#185fa5">Business Case</span>
+    <div class="ws-intro-text">
+      <h2>Business Case</h2>
+      <p>Financial model, unit economics, funding strategy, and investor narrative. Kelvin leads with Anna providing market sizing and go-to-market validation. No paid acquisition spend until the revenue model is resolved.</p>
+    </div>
+  </div>
+  <div class="flag-box"><strong>Critical dependency:</strong> The current acquisition strategy is built on a £500k Year 1 budget with no revenue model behind it. The pricing/freemium decision must be resolved before paid spend begins — this is the single biggest open question across all workstreams.</div>
+  <div class="section-label">Gantt</div>
+  <div class="gantt-wrap">
+    <div class="gantt-head cols-3-8">
+      <div>Milestone</div><div>Owner</div><div>Priority</div><div>Now–Apr 30</div><div>May</div><div>June</div><div>July</div><div>Ongoing</div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Free vs. Circle pricing decision made — resolved outside PRD and fed back into product and commercials</div>
+      <div class="g-owner">Kelvin + Raul</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Market sizing assumptions documented — UK TAM, SAM, SOM with supporting data</div>
+      <div class="g-owner">Anna + Raul</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Financial model v1 — revenue scenarios, CAC, LTV, 18-month runway model</div>
+      <div class="g-owner">Kelvin + Anna</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Fundraising narrative drafted — investor-facing summary of business case, traction, and ask</div>
+      <div class="g-owner">Kelvin + Anna</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Investor deck v1 ready — aligned with advisory board output from April 2026</div>
+      <div class="g-owner">Kelvin + Anna</div>
+      <div class="g-due"><span class="chip chip-june">June–July</span></div>
+      <div></div><div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-june" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     TARGET MARKET
+════════════════════════════════════ -->
+<section class="ws-section" id="ws-targetmkt">
+  <div class="ws-intro">
+    <span class="ws-badge" style="background:#eaf2e0;color:#3a6e1a">Target Market</span>
+    <div class="ws-intro-text">
+      <h2>Target Market</h2>
+      <p>Segment definition, insight, and validation for UK and New York. Covers the four primary segments — newly relocated, post-separation, career-transitioning, and life-stage shifters (25–35) — plus equity-lens additions from the April 2026 addendum.</p>
+    </div>
+  </div>
+  <div class="section-label">Gantt</div>
+  <div class="gantt-wrap">
+    <div class="gantt-head cols-3-8">
+      <div>Milestone</div><div>Owner</div><div>Priority</div><div>Now–Apr 30</div><div>May</div><div>June</div><div>July</div><div>Ongoing</div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Segment brief finalized — four primary segments documented with pain points, messaging, and channel fit</div>
+      <div class="g-owner">Anna + Raul</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Onboarding questionnaire cultural review — assumptions in "social style" taxonomy checked before beta</div>
+      <div class="g-owner">Yana + Anna</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">User research plan — 10–15 interviews with target segments before Phase 2 expansion</div>
+      <div class="g-owner">Anna + Yana</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">LGBTQ+ and migrant segment analysis — value proposition drafted, distribution partners identified</div>
+      <div class="g-owner">Anna</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">New York market segment analysis — primary segments, cultural nuances, channel differences vs UK</div>
+      <div class="g-owner">Anna + Raul</div>
+      <div class="g-due"><span class="chip chip-june">June–July</span></div>
+      <div></div><div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-june" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     GOVERNANCE
+════════════════════════════════════ -->
+<section class="ws-section" id="ws-governance">
+  <div class="ws-intro">
+    <span class="ws-badge" style="background:#fceee9;color:#c84b2f">Governance</span>
+    <div class="ws-intro-text">
+      <h2>Governance</h2>
+      <p>Legal structure, advisory framework, working agreements, decision rights, and equity — including the gap identified in the April 2026 addendum around equity as a named organizational value.</p>
+    </div>
+  </div>
+  <div class="section-label">Gantt</div>
+  <div class="gantt-wrap">
+    <div class="gantt-head cols-3-8">
+      <div>Milestone</div><div>Owner</div><div>Priority</div><div>Now–Apr 30</div><div>May</div><div>June</div><div>July</div><div>Ongoing</div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Working agreement updated — equity added as sixth core value; aligned with equity addendum</div>
+      <div class="g-owner">Kelvin + Anna</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Advisory board roles and responsibilities confirmed — scope, decision rights, meeting cadence</div>
+      <div class="g-owner">Kelvin + Dai</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Legal structure confirmed — entity type, founder equity, IP ownership, advisor equity agreed</div>
+      <div class="g-owner">Kelvin + Dai</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Data governance policy — user data, matching data, consent framework — drafted and reviewed</div>
+      <div class="g-owner">Ian + Kelvin</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Board structure formalized — first formal board meeting scheduled, reporting cadence agreed</div>
+      <div class="g-owner">Kelvin + Dai</div>
+      <div class="g-due"><span class="chip chip-june">June–July</span></div>
+      <div></div><div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-june" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     TECHNOLOGY
+════════════════════════════════════ -->
+<section class="ws-section" id="ws-technology">
+  <div class="ws-intro">
+    <span class="ws-badge" style="background:#e8f5f2;color:#1a7f6e">Technology</span>
+    <div class="ws-intro-text">
+      <h2>Technology</h2>
+      <p>Platform build, matching engine, AI toolkit for WTC content, app infrastructure, and App Store optimization. Ian and Natan own. Anna's advisory lens is on the user-facing experience and ensuring tech decisions support — not constrain — the 90-day journey.</p>
+    </div>
+  </div>
+  <div class="section-label">Gantt</div>
+  <div class="gantt-wrap">
+    <div class="gantt-head cols-3-8">
+      <div>Milestone</div><div>Owner</div><div>Priority</div><div>Now–Apr 30</div><div>May</div><div>June</div><div>July</div><div>Ongoing</div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Waitlist and referral-only beta sign-up page live — London-only, no paid traffic yet</div>
+      <div class="g-owner">Ian + Natan</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">WTC AI production toolkit — animated chat overlay, voiceover style guide, avatar system, caption template</div>
+      <div class="g-owner">Ian + Natan</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Referral mechanics built — group invite trigger, post-meet share prompt, Friendaversary milestone</div>
+      <div class="g-owner">Ian + Natan</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">App Store Optimization — screenshots A/B test, description, ratings collection trigger</div>
+      <div class="g-owner">Ian + Natan</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Matching engine v1 — life-stage signal weighted, group formation logic, city density thresholds</div>
+      <div class="g-owner">Ian + Natan</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Iterative product build — sprint cycles, tech debt management, infrastructure scaling</div>
+      <div class="g-owner">Ian + Natan</div>
+      <div class="g-due"><span class="chip chip-ongoing">Ongoing</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     OPERATIONS
+════════════════════════════════════ -->
+<section class="ws-section" id="ws-operations">
+  <div class="ws-intro">
+    <span class="ws-badge" style="background:#faeaf2;color:#9c2f62">Operations</span>
+    <div class="ws-intro-text">
+      <h2>Operations</h2>
+      <p>Includes customer service, concierge (human chaperone program), group facilitation playbooks, and day-to-day operational infrastructure. Yana leads customer service; Kelvin and Anna co-own concierge design with Yana executing.</p>
+    </div>
+  </div>
+  <div class="section-label">Gantt</div>
+  <div class="gantt-wrap">
+    <div class="gantt-head cols-3-8">
+      <div>Milestone</div><div>Owner</div><div>Priority</div><div>Now–Apr 30</div><div>May</div><div>June</div><div>July</div><div>Ongoing</div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Customer service playbook v1 — inbound query handling, group escalation protocol, safety reporting</div>
+      <div class="g-owner">Yana</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Concierge model defined — human chaperone brief, tone guide, 90-day facilitation arc mapped week by week</div>
+      <div class="g-owner">Kelvin + Anna (Yana)</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">AI assistant behavioral brief — tone, permissions, distress escalation protocol — one page for dev team</div>
+      <div class="g-owner">Kelvin + Anna (Yana)</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Concierge pilot — first cohort of groups fully chaperoned; outcomes documented for product feedback</div>
+      <div class="g-owner">Yana + Anna</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Group health monitoring live — 30/60/90-day active group rates tracked, intervention triggers defined</div>
+      <div class="g-owner">Yana + Ian</div>
+      <div class="g-due"><span class="chip chip-ongoing">Ongoing</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Operational KPIs tracked weekly — group formation rate, chaperone load, CS response time, NPS</div>
+      <div class="g-owner">Yana</div>
+      <div class="g-due"><span class="chip chip-ongoing">Ongoing</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     PARTNER MANAGEMENT
+════════════════════════════════════ -->
+<section class="ws-section" id="ws-partners">
+  <div class="ws-intro">
+    <span class="ws-badge" style="background:#fef3e0;color:#c97d0a">Partner Mgmt</span>
+    <div class="ws-intro-text">
+      <h2>Partner Management</h2>
+      <p>NHS social prescribing, co-living operators, family law ecosystem, corporate relocation, career transition organizations, and VCSE sector. Raul owns the full partner management workstream. Chris is commercials only.</p>
+    </div>
+  </div>
+  <div class="flag-box"><strong>First-mover risk:</strong> If StoriBoard secures a PCN partnership before NewKroo, the "only friendship app recommended by NHS social prescribers" claim is gone. PCN outreach starts this week.</div>
+  <div class="section-label">Gantt</div>
+  <div class="gantt-wrap">
+    <div class="gantt-head cols-3-8">
+      <div>Milestone</div><div>Owner</div><div>Priority</div><div>Now–Apr 30</div><div>May</div><div>June</div><div>July</div><div>Ongoing</div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">PCN target list — 3–5 London Primary Care Networks with active social prescribing link workers</div>
+      <div class="g-owner">Raul + Kelvin</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">London co-living partner brief — The Collective, Gravity Co, Vonder — first outreach sent</div>
+      <div class="g-owner">Raul</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">NHS partnership proposition document — honest brief on what NewKroo can deliver for referred users</div>
+      <div class="g-owner">Raul + Anna</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">VCSE outreach — Campaign to End Loneliness, Relate, Mind, Gingerbread — introductory meetings booked</div>
+      <div class="g-owner">Raul + Kelvin</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">First PCN partnership signed — minimum one London borough before city expansion launches</div>
+      <div class="g-owner">Raul + Kelvin</div>
+      <div class="g-due"><span class="chip chip-june">June–July</span></div>
+      <div></div><div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-june" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">City expansion partner research — Manchester, Birmingham, Edinburgh, Bristol co-living and NHS equivalents</div>
+      <div class="g-owner">Raul</div>
+      <div class="g-due"><span class="chip chip-june">June–July</span></div>
+      <div></div><div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-june" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-june" style="left:0;width:50%"></div></div></div>
+      <div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     COMMERCIALS
+════════════════════════════════════ -->
+<section class="ws-section" id="ws-commercials">
+  <div class="ws-intro">
+    <span class="ws-badge" style="background:#eeedfb;color:#534ab7">Commercials</span>
+    <div class="ws-intro-text">
+      <h2>Commercials</h2>
+      <p>Revenue model, pricing architecture, B2B commercial agreements, fundraising, and unit economics. Raul leads; Chris is included here as co-owner. Note: Raul also owns partner management separately.</p>
+    </div>
+  </div>
+  <div class="section-label">Gantt</div>
+  <div class="gantt-wrap">
+    <div class="gantt-head cols-3-8">
+      <div>Milestone</div><div>Owner</div><div>Priority</div><div>Now–Apr 30</div><div>May</div><div>June</div><div>July</div><div>Ongoing</div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Pricing architecture decided — Free vs. Circle tiers, NHS/B2B pricing, cost-per-match model explored</div>
+      <div class="g-owner">Raul + Chris</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Revenue model v1 — MRR projections, pricing scenarios, contribution margin by segment</div>
+      <div class="g-owner">Raul + Chris</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">B2B commercial terms template — for co-living, corporate relocation, NHS/PCN agreements</div>
+      <div class="g-owner">Raul + Chris</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Unit economics validated against Phase 1 data — CAC, LTV, payback period reviewed</div>
+      <div class="g-owner">Raul + Anna</div>
+      <div class="g-due"><span class="chip chip-june">June–July</span></div>
+      <div></div><div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-june" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Fundraising round preparation — terms, investor pipeline, data room structure</div>
+      <div class="g-owner">Raul + Kelvin</div>
+      <div class="g-due"><span class="chip chip-june">June–July</span></div>
+      <div></div><div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-june" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-june" style="left:0;width:80%"></div></div></div>
+      <div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     PRODUCT
+════════════════════════════════════ -->
+<section class="ws-section" id="ws-product">
+  <div class="ws-intro">
+    <span class="ws-badge" style="background:#e8f5f2;color:#1a7f6e">Product</span>
+    <div class="ws-intro-text">
+      <h2>Product</h2>
+      <p>MVP PRD, 90-day friendship formation journey design, matching logic, group chat architecture, and AI assistant brief. Ian, Natan, and Yana co-own. The 90-day journey skeleton is the most urgent product gap — it must exist before development goes further.</p>
+    </div>
+  </div>
+  <div class="flag-box"><strong>Critical gap:</strong> The 90-day facilitation journey is not yet in the MVP PRD. The group chat architecture is right, but there is no week-by-week skeleton of what the chaperone and AI are doing. This must be resolved before the next development sprint.</div>
+  <div class="section-label">Gantt</div>
+  <div class="gantt-wrap">
+    <div class="gantt-head cols-3-8">
+      <div>Milestone</div><div>Owner</div><div>Priority</div><div>Now–Apr 30</div><div>May</div><div>June</div><div>July</div><div>Ongoing</div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">PRD gaps resolved — 90-day journey skeleton, AI assistant brief, pre-match experience documented</div>
+      <div class="g-owner">Ian + Yana</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Matching logic equity review — demographic assumptions in algorithm surfaced and documented</div>
+      <div class="g-owner">Ian + Anna</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">200-hour milestone tracker validated — hour thresholds confirmed against academic research, prize design locked</div>
+      <div class="g-owner">Ian + Natan</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Phase 1 product KPI dashboard live — group formation rate, 30-day retention, NPS, chaperone load</div>
+      <div class="g-owner">Ian + Anna</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Group composition demographic data reviewed — early cohort matching patterns analyzed through equity lens</div>
+      <div class="g-owner">Ian + Anna</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Iterative sprint cycle — weekly build, test, feedback loop maintained throughout</div>
+      <div class="g-owner">Ian + Natan + Yana</div>
+      <div class="g-due"><span class="chip chip-ongoing">Ongoing</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     MARKETING
+════════════════════════════════════ -->
+<section class="ws-section" id="ws-marketing">
+  <div class="ws-intro">
+    <span class="ws-badge" style="background:#fceee9;color:#c84b2f">Marketing</span>
+    <div class="ws-intro-text">
+      <h2>Marketing</h2>
+      <p>Content calendar execution, brand guidelines, WTC series, paid acquisition, LinkedIn strategy, creator partnerships, PR, and equity addendum follow-through on creator diversity. Anna leads; Mark executes.</p>
+    </div>
+  </div>
+  <div class="section-label">Gantt</div>
+  <div class="gantt-wrap">
+    <div class="gantt-head cols-3-8">
+      <div>Milestone</div><div>Owner</div><div>Priority</div><div>Now–Apr 30</div><div>May</div><div>June</div><div>July</div><div>Ongoing</div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">WTC Series 1 — all 5 episodes batch-produced, consent signed, before Episode 1 drops</div>
+      <div class="g-owner">Anna + Mark</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Launch date confirmed — all channels aligned (brand TikTok, founder LinkedIn, Instagram) for go-live</div>
+      <div class="g-owner">Anna</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Brand guidelines distributed — vocabulary sign-off from Mark and any external creators before launch</div>
+      <div class="g-owner">Anna</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Founder LinkedIn content spine — 12-week research arc planned, Week 1 post drafted and approved</div>
+      <div class="g-owner">Anna → founder</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-now" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Short Film 1 "The Cost of Alone" — director briefed, subjects identified, shoot scheduled for M2 release</div>
+      <div class="g-owner">Anna + Mark</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Creator long-list — 3 targets researched, diversity criteria applied before any outreach is finalized</div>
+      <div class="g-owner">Anna + Mark</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Paid social creative brief (Meta + TikTok Spark Ads) — UGC-style assets, no polished ads</div>
+      <div class="g-owner">Anna + Mark</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">LinkedIn paid campaign launch — job-change targeting, career-transitioning professionals, London-based</div>
+      <div class="g-owner">Anna + Mark</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-may" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Follower threshold check — 10k–15k gate; go/no-go decision on Phase 3 poll mechanics documented</div>
+      <div class="g-owner">Anna + Mark</div>
+      <div class="g-due"><span class="chip chip-june">June–July</span></div>
+      <div></div><div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-june" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">"Friendship Gap Report" research commissioned — PR anchor for earned media and press strategy</div>
+      <div class="g-owner">Anna + Mark</div>
+      <div class="g-due"><span class="chip chip-june">June–July</span></div>
+      <div></div><div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-june" style="left:0;width:95%"></div></div></div>
+      <div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Brand channel weekly cadence maintained — 2–4x TikTok, 3x Instagram throughout</div>
+      <div class="g-owner">Anna + Mark</div>
+      <div class="g-due"><span class="chip chip-ongoing">Ongoing</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Founder posts maintained — 1x/wk LinkedIn, 1–2x/wk TikTok, 1x/wk Instagram carousel</div>
+      <div class="g-owner">Anna → founder</div>
+      <div class="g-due"><span class="chip chip-ongoing">Ongoing</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-ongoing" style="left:0;width:95%"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     OD / HR
+════════════════════════════════════ -->
+<section class="ws-section" id="ws-odhr">
+  <div class="ws-intro">
+    <span class="ws-badge" style="background:var(--slate);color:var(--muted)">OD / HR</span>
+    <div class="ws-intro-text">
+      <h2>OD / HR</h2>
+      <p>Organizational design, hiring plan, team structure, culture, and people operations. Currently unassigned — this workstream needs an owner before end of April. Until assigned, Kelvin holds interim accountability.</p>
+    </div>
+  </div>
+  <div class="warn-box"><strong>Owner unassigned.</strong> OD/HR has no named owner. The working agreement and equity addendum both surface people-related decisions that need a home. Recommend assigning an interim owner — Kelvin or an external HR advisor — this week, with a plan to formalize by end of May.</div>
+  <div class="section-label">Gantt</div>
+  <div class="gantt-wrap">
+    <div class="gantt-head cols-3-8">
+      <div>Milestone</div><div>Owner</div><div>Priority</div><div>Now–Apr 30</div><div>May</div><div>June</div><div>July</div><div>Ongoing</div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">OD/HR workstream owner assigned — interim or permanent; accountability confirmed before end April</div>
+      <div class="g-owner" style="color:var(--coral);font-style:italic">TBC</div>
+      <div class="g-due"><span class="chip chip-now">Immediate</span></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-tbc" style="left:0;width:95%">Assign owner</div></div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Hiring plan v1 — roles needed for Phase 1 and Phase 2, sequencing, compensation bands</div>
+      <div class="g-owner" style="color:var(--coral);font-style:italic">TBC</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-tbc" style="left:0;width:95%">TBC</div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Team structure and decision rights documented — who decides what, escalation paths, meeting cadence</div>
+      <div class="g-owner" style="color:var(--coral);font-style:italic">TBC</div>
+      <div class="g-due"><span class="chip chip-may">May</span></div>
+      <div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-tbc" style="left:0;width:95%">TBC</div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="gantt-row cols-3-8">
+      <div class="g-label">Equity-informed culture review — working agreement and team practices reviewed against equity addendum findings</div>
+      <div class="g-owner" style="color:var(--coral);font-style:italic">TBC + Anna</div>
+      <div class="g-due"><span class="chip chip-june">June–July</span></div>
+      <div></div><div></div>
+      <div class="g-bars"><div class="bar-track"><div class="bar bar-tbc" style="left:0;width:95%">TBC</div></div></div>
+      <div></div><div></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ── CONFIGURATION ────────────────────────────────────────────────
+// Once your Render backend is deployed, replace the placeholder below
+// with your actual Render URL, e.g.:
+// const BACKEND_URL = 'https://newkroo-tracker.onrender.com';
+const BACKEND_URL = 'https://newkroo-tracker-backend.onrender.com';   // <-- paste your Render URL here
+const POLL_INTERVAL_MS = 30000; // poll every 30 seconds
+// ─────────────────────────────────────────────────────────────────
+
+// Tab navigation
+function showTab(id, btn) {
+  document.querySelectorAll('.ws-section').forEach(s => s.classList.remove('visible'));
+  document.getElementById('ws-' + id).classList.add('visible');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+document.querySelectorAll('.ov-card').forEach(card => {
+  card.addEventListener('click', function() {
+    const fn = this.getAttribute('onclick');
+    if (fn) eval(fn);
+  });
+});
+
+// ── MILESTONE KEY NORMALIZER ─────────────────────────────────────
+// Must match the normalize() function in server.js
+function normalize(str) {
+  return str.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+}
+
+// ── BUILD MILESTONE REGISTRY ─────────────────────────────────────
+// Reads all .g-label elements and registers them by normalized key,
+// so status updates from Slack can find the right row.
+const registry = {}; // key -> { labelEl, rowEl }
+
+function buildRegistry() {
+  document.querySelectorAll('.g-label').forEach(el => {
+    const text = el.querySelector('.g-label-text')
+      ? el.querySelector('.g-label-text').textContent
+      : el.textContent;
+    const key = normalize(text);
+    registry[key] = { labelEl: el, rowEl: el.closest('.gantt-row') };
+  });
+}
+
+// ── STATUS DOT INJECTION ─────────────────────────────────────────
+// Wraps each .g-label's text in a .g-label-text span and prepends
+// a status dot — done once on load.
+function injectStatusDots() {
+  document.querySelectorAll('.g-label').forEach(el => {
+    if (el.querySelector('.status-dot')) return; // already injected
+    const originalHTML = el.innerHTML;
+    el.innerHTML = `<span class="status-dot none"></span><span class="g-label-text">${originalHTML}</span>`;
+  });
+}
+
+// ── APPLY STATUS TO A ROW ────────────────────────────────────────
+function applyStatus(key, data) {
+  const entry = registry[key];
+  if (!entry) return;
+
+  const dot = entry.labelEl.querySelector('.status-dot');
+  if (dot) {
+    dot.className = `status-dot ${data.status}`;
+    dot.title = `${data.status} — updated by @${data.updatedBy} on ${new Date(data.updatedAt).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })}`;
+  }
+
+  // Remove any existing badge then add updated one
+  const existingBadge = entry.labelEl.querySelector('.status-badge');
+  if (existingBadge) existingBadge.remove();
+
+  if (data.status !== 'reset') {
+    const labels = { complete:'Complete', inprogress:'In progress', blocked:'Blocked' };
+    const badge = document.createElement('span');
+    badge.className = `status-badge ${data.status}`;
+    badge.textContent = labels[data.status] || data.status;
+    badge.title = `@${data.updatedBy} · ${new Date(data.updatedAt).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' })}`;
+    entry.labelEl.querySelector('.g-label-text').appendChild(badge);
+  }
+
+  // Dim completed rows subtly
+  if (entry.rowEl) {
+    entry.rowEl.style.opacity = data.status === 'complete' ? '0.6' : '';
+  }
+}
+
+// ── SYNC BAR ─────────────────────────────────────────────────────
+function setSyncState(state, text) {
+  const bar = document.getElementById('sync-bar');
+  if (!bar) return;
+  const dot = bar.querySelector('.sync-dot');
+  const msg = bar.querySelector('#sync-msg');
+  dot.className = `sync-dot ${state}`;
+  if (msg) msg.textContent = text;
+}
+
+// ── POLL BACKEND ─────────────────────────────────────────────────
+async function poll() {
+  if (!BACKEND_URL) return; // no-op until URL is configured
+
+  try {
+    setSyncState('pending', 'Syncing…');
+    const res = await fetch(`${BACKEND_URL}/status`, { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    Object.entries(data.milestones || {}).forEach(([key, info]) => {
+      applyStatus(key, info);
+    });
+
+    const ts = new Date(data.updatedAt).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+    setSyncState('live', `Live · last synced ${ts}`);
+  } catch (err) {
+    setSyncState('error', `Sync error — retrying in 30s`);
+  }
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  injectStatusDots();
+  buildRegistry();
+
+  if (!BACKEND_URL) {
+    // Show configuration notice in every workstream section
+    document.querySelectorAll('.ws-section').forEach(section => {
+      const notice = document.createElement('div');
+      notice.className = 'not-configured';
+      notice.innerHTML = `<strong>Slack sync not yet connected.</strong> Contact your advisor to get the backend URL configured.`;
+      section.insertBefore(notice, section.firstChild);
+    });
+  } else {
+    poll();
+    setInterval(poll, POLL_INTERVAL_MS);
+  }
+});
+</script>
+
+</body>
+</html>
