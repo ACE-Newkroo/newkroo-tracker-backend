@@ -59,7 +59,7 @@ body { font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helveti
 /* ── MAIN ── */
 .main { max-width:1260px; margin:0 auto; padding:2rem 3rem 4rem; }
 .ws-section { display:none; }
-.ws-section.visible { display:block; }
+.ws-section.visible { display:block !important; }
 
 /* ── WS INTRO ── */
 .ws-intro { display:flex; gap:1.25rem; align-items:flex-start; margin-bottom:1.75rem; padding-bottom:1.5rem; border-bottom:1px solid var(--border); }
@@ -209,7 +209,7 @@ body { font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helveti
 <!-- ════════════════════════════════════
      OVERVIEW
 ════════════════════════════════════ -->
-<section class="ws-section visible" id="ws-overview">
+<section class="ws-section visible" id="ws-overview" style="display:block">
 
   <div class="flag-box"><strong>Phase 1 is live.</strong> The content calendar's January launch window has passed — Phase 1 is reframed as imminent. WTC batch production, waitlist launch, and PCN outreach are the critical path items this week. Phase 1 closes end of May 2026.</div>
 
@@ -1231,7 +1231,7 @@ async function poll() {
 }
 
 // ── INIT ─────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+function init() {
   injectStatusDots();
   buildRegistry();
 
@@ -1247,7 +1247,13 @@ document.addEventListener('DOMContentLoaded', () => {
     poll();
     setInterval(poll, POLL_INTERVAL_MS);
   }
-});
+}
+// Run immediately and also on DOMContentLoaded as fallback
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 </script>
 
 </body>
