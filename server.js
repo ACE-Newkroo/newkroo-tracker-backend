@@ -3,9 +3,39 @@ const crypto = require('crypto');
 const app = express();
 
 const milestones = {};
+const activityLog = [];
+
+const SLACK_WEBHOOK = process.env.SLACK_WEBHOOK_URL;
+const SLACK_SIGNING_SECRET = process.env.SLACK_SIGNING_SECRET;
 
 function normalize(str) {
   return str.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+}
+
+function verifySlackRequest(req) {
+  if (!SLACK_SIGNING_SECRET) return true;
+  const timestamp = req.headers['x-slack-request-timestamp'];
+  const slackSig  = req.headers['x-slack-signature'];
+  if (!timestamp || !slackSig) return false;
+  if (Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) return false;
+  const base = `v0:${timestamp}:${new URLSearchParams(req.body).toString()}`;
+  const computed = 'v0=' + crypto.createHmac('sha256', SLACK_SIGNING_SECRET).update(base).digest('hex');
+  try {
+    return crypto.timingSafeEqual(Buffer.from(computed), Buffer.from(slackSig));
+  } catch { return false; }
+}
+
+async function postToTrackerChannel(text) {
+  if (!SLACK_WEBHOOK) return;
+  try {
+    await fetch(SLACK_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+  } catch (err) {
+    console.error('Webhook error:', err.message);
+  }
 }
 
 app.use((req, res, next) => {
@@ -16,24 +46,10 @@ app.use((req, res, next) => {
 
 app.use(express.urlencoded({ extended: true }));
 
-function verifySlackRequest(req) {
-  const signingSecret = process.env.SLACK_SIGNING_SECRET;
-  if (!signingSecret) return true;
-  const timestamp = req.headers['x-slack-request-timestamp'];
-  const slackSig  = req.headers['x-slack-signature'];
-  if (!timestamp || !slackSig) return false;
-  if (Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) return false;
-  const base = `v0:${timestamp}:${new URLSearchParams(req.body).toString()}`;
-  const computed = 'v0=' + crypto.createHmac('sha256', signingSecret).update(base).digest('hex');
-  try {
-    return crypto.timingSafeEqual(Buffer.from(computed), Buffer.from(slackSig));
-  } catch {
-    return false;
-  }
-}
+app.get('/', (req, res) => res.json({ status: 'ok', service: 'NewKroo Tracker Backend' }));
 
 app.get('/status', (req, res) => {
-  res.json({ milestones, updatedAt: new Date().toISOString() });
+  res.json({ milestones, activityLog, updatedAt: new Date().toISOString() });
 });
 
 app.post('/slack', (req, res) => {
@@ -76,24 +92,36 @@ app.post('/slack', (req, res) => {
   const action        = match[1].toLowerCase();
   const milestoneName = match[2].trim();
   const key           = normalize(milestoneName);
+  const now           = new Date().toISOString();
 
   milestones[key] = {
     displayName: milestoneName,
     status:      action,
     updatedBy:   user,
-    updatedAt:   new Date().toISOString()
+    updatedAt:   now
   };
 
-  const icons  = { complete: '✅', inprogress: '🔄', blocked: '🚫', reset: '⬜' };
-  const labels = { complete: 'marked complete', inprogress: 'marked in progress', blocked: 'flagged as blocked', reset: 'reset to not started' };
+  // Add to activity log (newest first, keep last 100)
+  const icons   = { complete: '✅', inprogress: '🔄', blocked: '🚫', reset: '⬜' };
+  const labels  = { complete: 'marked complete', inprogress: 'marked in progress', blocked: 'flagged as blocked', reset: 'reset to not started' };
+
+  activityLog.unshift({
+    milestoneName,
+    action,
+    updatedBy: user,
+    updatedAt: now
+  });
+  if (activityLog.length > 100) activityLog.pop();
+
+  // Post to #tracker-updates channel
+  const notifText = `${icons[action]} *${milestoneName}* ${labels[action]} by @${user}`;
+  postToTrackerChannel(notifText);
 
   return res.json({
     response_type: 'in_channel',
-    text: `${icons[action]} *${milestoneName}* ${labels[action]} by @${user}`
+    text: notifText
   });
 });
-
-app.get('/', (req, res) => res.json({ status: 'ok', service: 'NewKroo Tracker Backend' }));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`NewKroo tracker backend running on port ${PORT}`));
