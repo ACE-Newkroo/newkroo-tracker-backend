@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NewKroo — Advisory Workstream Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <style>
 :root {
   --navy: #0f1f3d;
@@ -30,14 +31,14 @@
   --shadow: 0 1px 4px rgba(15,31,61,0.08);
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif; background:var(--cream); color:var(--ink); font-size:14px; line-height:1.6; }
+body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--ink); font-size:14px; line-height:1.6; }
 
 /* ── HEADER ── */
 .site-header { background:var(--navy); padding:2.5rem 3rem 2rem; position:relative; overflow:hidden; }
 .site-header::before { content:''; position:absolute; top:-80px; right:-80px; width:340px; height:340px; border-radius:50%; border:1px solid rgba(255,255,255,0.05); }
 .site-header::after  { content:''; position:absolute; bottom:-50px; right:100px; width:200px; height:200px; border-radius:50%; border:1px solid rgba(255,255,255,0.03); }
 .header-eyebrow { font-size:10.5px; font-weight:600; letter-spacing:0.13em; text-transform:uppercase; color:var(--teal-mid); margin-bottom:0.6rem; }
-.header-title { font-family:'DM Serif Display',Georgia,'Times New Roman',serif; font-size:2.4rem; color:#fff; line-height:1.15; margin-bottom:0.35rem; }
+.header-title { font-family:'DM Serif Display',serif; font-size:2.4rem; color:#fff; line-height:1.15; margin-bottom:0.35rem; }
 .header-sub { font-size:13px; color:rgba(255,255,255,0.45); }
 .header-meta { margin-top:1.75rem; display:flex; gap:2rem; flex-wrap:wrap; }
 .meta-chip { font-size:12px; color:rgba(255,255,255,0.45); }
@@ -59,12 +60,12 @@ body { font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helveti
 /* ── MAIN ── */
 .main { max-width:1260px; margin:0 auto; padding:2rem 3rem 4rem; }
 .ws-section { display:none; }
-.ws-section.visible { display:block !important; }
+.ws-section.visible { display:block; }
 
 /* ── WS INTRO ── */
 .ws-intro { display:flex; gap:1.25rem; align-items:flex-start; margin-bottom:1.75rem; padding-bottom:1.5rem; border-bottom:1px solid var(--border); }
 .ws-badge { font-size:10px; font-weight:700; letter-spacing:0.11em; text-transform:uppercase; padding:3px 10px; border-radius:3px; flex-shrink:0; margin-top:5px; }
-.ws-intro-text h2 { font-family:'DM Serif Display',Georgia,'Times New Roman',serif; font-size:1.5rem; color:var(--navy); font-weight:400; margin-bottom:0.3rem; }
+.ws-intro-text h2 { font-family:'DM Serif Display',serif; font-size:1.5rem; color:var(--navy); font-weight:400; margin-bottom:0.3rem; }
 .ws-intro-text p  { font-size:13px; color:var(--muted); max-width:680px; line-height:1.65; }
 
 /* ── GANTT TABLE ── */
@@ -209,7 +210,7 @@ body { font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helveti
 <!-- ════════════════════════════════════
      OVERVIEW
 ════════════════════════════════════ -->
-<section class="ws-section visible" id="ws-overview" style="display:block">
+<section class="ws-section visible" id="ws-overview">
 
   <div class="flag-box"><strong>Phase 1 is live.</strong> The content calendar's January launch window has passed — Phase 1 is reframed as imminent. WTC batch production, waitlist launch, and PCN outreach are the critical path items this week. Phase 1 closes end of May 2026.</div>
 
@@ -1231,7 +1232,7 @@ async function poll() {
 }
 
 // ── INIT ─────────────────────────────────────────────────────────
-function init() {
+document.addEventListener('DOMContentLoaded', () => {
   injectStatusDots();
   buildRegistry();
 
@@ -1247,13 +1248,7 @@ function init() {
     poll();
     setInterval(poll, POLL_INTERVAL_MS);
   }
-}
-// Run immediately and also on DOMContentLoaded as fallback
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
+});
 </script>
 
 </body>
