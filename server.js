@@ -7,25 +7,20 @@ const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 
 async function redisGet(key) {
-  if (!REDIS_URL || !REDIS_TOKEN) { console.log('Redis not configured'); return null; }
+  if (!REDIS_URL || !REDIS_TOKEN) return null;
   try {
-    const url = REDIS_URL + '/get/' + key;
-    console.log('Redis GET:', url);
-    const res = await fetch(url, { headers: { Authorization: 'Bearer ' + REDIS_TOKEN } });
+    const res = await fetch(REDIS_URL + '/get/' + key, { headers: { Authorization: 'Bearer ' + REDIS_TOKEN } });
     const data = await res.json();
-    return data.result ? JSON.parse(data.result) : null;
+    if (!data.result) return null;
+    return JSON.parse(data.result);
   } catch (e) { console.error('Redis GET error:', e.message); return null; }
 }
 
 async function redisSet(key, value) {
   if (!REDIS_URL || !REDIS_TOKEN) return;
   try {
-    const url = REDIS_URL + '/set/' + key;
-    await fetch(url, {
-      method: 'POST',
-      headers: { Authorization: 'Bearer ' + REDIS_TOKEN, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ value: JSON.stringify(value) })
-    });
+    const encoded = encodeURIComponent(JSON.stringify(value));
+    await fetch(REDIS_URL + '/set/' + key + '/' + encoded, { method: 'GET', headers: { Authorization: 'Bearer ' + REDIS_TOKEN } });
   } catch (e) { console.error('Redis SET error:', e.message); }
 }
 
@@ -54,9 +49,7 @@ app.use((req, res, next) => { res.header('Access-Control-Allow-Origin', '*'); re
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
-  console.log('REDIS_URL value:', REDIS_URL);
-  console.log('REDIS_TOKEN set:', !!REDIS_TOKEN);
-  res.json({ status: 'ok', service: 'NewKroo Tracker Backend', webhookConfigured: !!SLACK_WEBHOOK_URL, redisConfigured: !!(REDIS_URL && REDIS_TOKEN), redisUrl: REDIS_URL });
+  res.json({ status: 'ok', service: 'NewKroo Tracker Backend', webhookConfigured: !!SLACK_WEBHOOK_URL, redisConfigured: !!(REDIS_URL && REDIS_TOKEN) });
 });
 
 app.get('/status', async (req, res) => {
@@ -74,8 +67,7 @@ app.post('/slack', async (req, res) => {
   if (!text || text === 'status') {
     const entries = Object.entries(milestones);
     if (entries.length === 0) return res.json({ response_type: 'ephemeral', text: 'No milestones tracked yet.' });
-    const icons = { complete: 'V', inprogress: 'R', blocked: 'B', reset: 'O' };
-    const lines = entries.map(([, data]) => (icons[data.status] || 'O') + ' *' + data.displayName + '* -- ' + data.status + ' (@' + data.updatedBy + ')');
+    const lines = entries.map(([, data]) => '*' + data.displayName + '* -- ' + data.status + ' (@' + data.updatedBy + ')');
     return res.json({ response_type: 'in_channel', text: '*NewKroo milestone tracker*\n\n' + lines.join('\n') });
   }
   const match = text.match(/^(complete|inprogress|blocked|reset)\s+"(.+)"$/i);
