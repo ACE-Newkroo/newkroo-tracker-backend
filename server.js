@@ -5,31 +5,43 @@ const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
 const SLACK_SIGNING_SECRET = process.env.SLACK_SIGNING_SECRET;
 const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+
 async function redisGet(key) {
-  if (!REDIS_URL) return null;
+  if (!REDIS_URL || !REDIS_TOKEN) { console.log('Redis not configured'); return null; }
   try {
-    const res = await fetch(`${REDIS_URL}/get/${key}`, { headers: { Authorization: `Bearer ${REDIS_TOKEN}` } });
+    const url = REDIS_URL + '/get/' + key;
+    console.log('Redis GET:', url);
+    const res = await fetch(url, { headers: { Authorization: 'Bearer ' + REDIS_TOKEN } });
     const data = await res.json();
     return data.result ? JSON.parse(data.result) : null;
   } catch (e) { console.error('Redis GET error:', e.message); return null; }
 }
+
 async function redisSet(key, value) {
-  if (!REDIS_URL) return;
+  if (!REDIS_URL || !REDIS_TOKEN) return;
   try {
-    await fetch(`${REDIS_URL}/set/${key}`, { method: 'POST', headers: { Authorization: `Bearer ${REDIS_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ value: JSON.stringify(value) }) });
+    const url = REDIS_URL + '/set/' + key;
+    await fetch(url, {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + REDIS_TOKEN, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ value: JSON.stringify(value) })
+    });
   } catch (e) { console.error('Redis SET error:', e.message); }
 }
+
 function normalize(str) { return str.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim(); }
+
 function verifySlackRequest(req) {
   if (!SLACK_SIGNING_SECRET) return true;
   const timestamp = req.headers['x-slack-request-timestamp'];
   const slackSig = req.headers['x-slack-signature'];
   if (!timestamp || !slackSig) return false;
   if (Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) return false;
-  const base = `v0:${timestamp}:${new URLSearchParams(req.body).toString()}`;
+  const base = 'v0:' + timestamp + ':' + new URLSearchParams(req.body).toString();
   const computed = 'v0=' + crypto.createHmac('sha256', SLACK_SIGNING_SECRET).update(base).digest('hex');
   try { return crypto.timingSafeEqual(Buffer.from(computed), Buffer.from(slackSig)); } catch { return false; }
 }
+
 async function postToTrackerUpdates(text) {
   if (!SLACK_WEBHOOK_URL) return;
   try {
@@ -37,14 +49,22 @@ async function postToTrackerUpdates(text) {
     console.log('Webhook response status:', response.status);
   } catch (err) { console.error('Webhook error:', err.message); }
 }
+
 app.use((req, res, next) => { res.header('Access-Control-Allow-Origin', '*'); res.header('Access-Control-Allow-Headers', 'Content-Type'); next(); });
 app.use(express.urlencoded({ extended: true }));
-app.get('/', (req, res) => res.json({ status: 'ok', service: 'NewKroo Tracker Backend', webhookConfigured: !!SLACK_WEBHOOK_URL, redisConfigured: !!REDIS_URL }));
+
+app.get('/', (req, res) => {
+  console.log('REDIS_URL value:', REDIS_URL);
+  console.log('REDIS_TOKEN set:', !!REDIS_TOKEN);
+  res.json({ status: 'ok', service: 'NewKroo Tracker Backend', webhookConfigured: !!SLACK_WEBHOOK_URL, redisConfigured: !!(REDIS_URL && REDIS_TOKEN), redisUrl: REDIS_URL });
+});
+
 app.get('/status', async (req, res) => {
   const milestones = await redisGet('milestones') || {};
   const activityLog = await redisGet('activityLog') || [];
   res.json({ milestones, activityLog, updatedAt: new Date().toISOString() });
 });
+
 app.post('/slack', async (req, res) => {
   if (!verifySlackRequest(req)) return res.status(401).json({ error: 'Invalid signature' });
   const text = (req.body.text || '').trim();
@@ -54,26 +74,26 @@ app.post('/slack', async (req, res) => {
   if (!text || text === 'status') {
     const entries = Object.entries(milestones);
     if (entries.length === 0) return res.json({ response_type: 'ephemeral', text: 'No milestones tracked yet.' });
-    const icons = { complete: '✅', inprogress: '🔄', blocked: '🚫', reset: '⬜' };
-    const lines = entries.map(([, data]) => `${icons[data.status]||'⬜'} *${data.displayName}* — ${data.status} (@${data.updatedBy})`);
-    return res.json({ response_type: 'in_channel', text: `*NewKroo milestone tracker*\n\n${lines.join('\n')}` });
+    const icons = { complete: 'V', inprogress: 'R', blocked: 'B', reset: 'O' };
+    const lines = entries.map(([, data]) => (icons[data.status] || 'O') + ' *' + data.displayName + '* -- ' + data.status + ' (@' + data.updatedBy + ')');
+    return res.json({ response_type: 'in_channel', text: '*NewKroo milestone tracker*\n\n' + lines.join('\n') });
   }
   const match = text.match(/^(complete|inprogress|blocked|reset)\s+"(.+)"$/i);
-  if (!match) return res.json({ response_type: 'ephemeral', text: 'Try: `/newkroo complete "milestone name"`' });
+  if (!match) return res.json({ response_type: 'ephemeral', text: 'Try: /newkroo complete "milestone name"' });
   const action = match[1].toLowerCase();
   const milestoneName = match[2].trim();
   const key = normalize(milestoneName);
   const now = new Date().toISOString();
   milestones[key] = { displayName: milestoneName, status: action, updatedBy: user, updatedAt: now };
-  const icons = { complete: '✅', inprogress: '🔄', blocked: '🚫', reset: '⬜' };
   const labels = { complete: 'marked complete', inprogress: 'marked in progress', blocked: 'flagged as blocked', reset: 'reset to not started' };
   activityLog.unshift({ milestoneName, action, updatedBy: user, updatedAt: now });
   if (activityLog.length > 100) activityLog.pop();
   await redisSet('milestones', milestones);
   await redisSet('activityLog', activityLog);
-  const notifText = `${icons[action]} *${milestoneName}* ${labels[action]} by @${user}`;
+  const notifText = '*' + milestoneName + '* ' + (labels[action] || action) + ' by @' + user;
   postToTrackerUpdates(notifText);
   return res.json({ response_type: 'in_channel', text: notifText });
 });
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`NewKroo tracker backend running on port ${PORT}`));
+app.listen(PORT, () => console.log('NewKroo tracker backend running on port ' + PORT));
