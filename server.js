@@ -14,13 +14,11 @@ async function redisGet(key) {
     return JSON.parse(data.result);
   } catch (e) { console.error('Redis GET error:', e.message); return null; }
 }
-async function redisSet(key, value) {
+function redisSetAsync(key, value) {
   if (!REDIS_URL || !REDIS_TOKEN) return;
-  try {
-    const res = await fetch(REDIS_URL + '/set/' + key, { method: 'POST', headers: { Authorization: 'Bearer ' + REDIS_TOKEN, 'Content-Type': 'application/json' }, body: JSON.stringify([key, JSON.stringify(value)]) });
-    const data = await res.json();
-    console.log('Redis SET result:', data.result);
-  } catch (e) { console.error('Redis SET error:', e.message); }
+  fetch(REDIS_URL + '/set/' + key, { method: 'POST', headers: { Authorization: 'Bearer ' + REDIS_TOKEN, 'Content-Type': 'application/json' }, body: JSON.stringify([key, JSON.stringify(value)]) })
+    .then(r => r.json()).then(d => console.log('Redis SET:', key, d.result))
+    .catch(e => console.error('Redis SET error:', e.message));
 }
 function normalize(str) { return str.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim(); }
 function verifySlackRequest(req) {
@@ -33,9 +31,10 @@ function verifySlackRequest(req) {
   const computed = 'v0=' + crypto.createHmac('sha256', SLACK_SIGNING_SECRET).update(base).digest('hex');
   try { return crypto.timingSafeEqual(Buffer.from(computed), Buffer.from(slackSig)); } catch { return false; }
 }
-async function postToTrackerUpdates(text) {
+function postToTrackerUpdatesAsync(text) {
   if (!SLACK_WEBHOOK_URL) return;
-  try { const r = await fetch(SLACK_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) }); console.log('Webhook:', r.status); } catch (e) { console.error('Webhook error:', e.message); }
+  fetch(SLACK_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) })
+    .then(r => console.log('Webhook:', r.status)).catch(e => console.error('Webhook error:', e.message));
 }
 app.use((req, res, next) => { res.header('Access-Control-Allow-Origin', '*'); res.header('Access-Control-Allow-Headers', 'Content-Type'); next(); });
 app.use(express.urlencoded({ extended: true }));
@@ -45,9 +44,8 @@ app.post('/slack', async (req, res) => {
   if (!verifySlackRequest(req)) return res.status(401).json({ error: 'Invalid signature' });
   const text = (req.body.text || '').trim();
   const user = req.body.user_name || 'someone';
-  const milestones = await redisGet('milestones') || {};
-  const activityLog = await redisGet('activityLog') || [];
   if (!text || text === 'status') {
+    const milestones = await redisGet('milestones') || {};
     const entries = Object.entries(milestones);
     if (entries.length === 0) return res.json({ response_type: 'ephemeral', text: 'No milestones tracked yet.' });
     const lines = entries.map(([, data]) => '*' + data.displayName + '* -- ' + data.status + ' (@' + data.updatedBy + ')');
@@ -59,15 +57,17 @@ app.post('/slack', async (req, res) => {
   const milestoneName = match[2].trim();
   const key = normalize(milestoneName);
   const now = new Date().toISOString();
-  milestones[key] = { displayName: milestoneName, status: action, updatedBy: user, updatedAt: now };
   const labels = { complete: 'marked complete', inprogress: 'marked in progress', blocked: 'flagged as blocked', reset: 'reset to not started' };
+  const notifText = '*' + milestoneName + '* ' + (labels[action] || action) + ' by @' + user;
+  res.json({ response_type: 'in_channel', text: notifText });
+  const milestones = await redisGet('milestones') || {};
+  const activityLog = await redisGet('activityLog') || [];
+  milestones[key] = { displayName: milestoneName, status: action, updatedBy: user, updatedAt: now };
   activityLog.unshift({ milestoneName, action, updatedBy: user, updatedAt: now });
   if (activityLog.length > 100) activityLog.pop();
-  await redisSet('milestones', milestones);
-  await redisSet('activityLog', activityLog);
-  const notifText = '*' + milestoneName + '* ' + (labels[action] || action) + ' by @' + user;
-  postToTrackerUpdates(notifText);
-  return res.json({ response_type: 'in_channel', text: notifText });
+  redisSetAsync('milestones', milestones);
+  redisSetAsync('activityLog', activityLog);
+  postToTrackerUpdatesAsync(notifText);
 });
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log('NewKroo tracker backend running on port ' + PORT));
