@@ -5,6 +5,7 @@ const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
 const SLACK_SIGNING_SECRET = process.env.SLACK_SIGNING_SECRET;
 const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+
 async function redisGet(key) {
   if (!REDIS_URL || !REDIS_TOKEN) return null;
   try {
@@ -14,13 +15,18 @@ async function redisGet(key) {
     return JSON.parse(data.result);
   } catch (e) { console.error('Redis GET error:', e.message); return null; }
 }
+
 function redisSetAsync(key, value) {
   if (!REDIS_URL || !REDIS_TOKEN) return;
-  fetch(REDIS_URL + '/set/' + key, { method: 'POST', headers: { Authorization: 'Bearer ' + REDIS_TOKEN, 'Content-Type': 'application/json' }, body: JSON.stringify([key, JSON.stringify(value)]) })
-    .then(r => r.json()).then(d => console.log('Redis SET:', key, d.result))
+  const str = JSON.stringify(value);
+  fetch(REDIS_URL + '/set/' + key + '/' + encodeURIComponent(str), {
+    headers: { Authorization: 'Bearer ' + REDIS_TOKEN }
+  }).then(r => r.json()).then(d => console.log('Redis SET ' + key + ':', d.result))
     .catch(e => console.error('Redis SET error:', e.message));
 }
+
 function normalize(str) { return str.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim(); }
+
 function verifySlackRequest(req) {
   if (!SLACK_SIGNING_SECRET) return true;
   const timestamp = req.headers['x-slack-request-timestamp'];
@@ -31,15 +37,24 @@ function verifySlackRequest(req) {
   const computed = 'v0=' + crypto.createHmac('sha256', SLACK_SIGNING_SECRET).update(base).digest('hex');
   try { return crypto.timingSafeEqual(Buffer.from(computed), Buffer.from(slackSig)); } catch { return false; }
 }
+
 function postToTrackerUpdatesAsync(text) {
   if (!SLACK_WEBHOOK_URL) return;
   fetch(SLACK_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) })
     .then(r => console.log('Webhook:', r.status)).catch(e => console.error('Webhook error:', e.message));
 }
+
 app.use((req, res, next) => { res.header('Access-Control-Allow-Origin', '*'); res.header('Access-Control-Allow-Headers', 'Content-Type'); next(); });
 app.use(express.urlencoded({ extended: true }));
+
 app.get('/', (req, res) => res.json({ status: 'ok', service: 'NewKroo Tracker Backend', webhookConfigured: !!SLACK_WEBHOOK_URL, redisConfigured: !!(REDIS_URL && REDIS_TOKEN) }));
-app.get('/status', async (req, res) => { const milestones = await redisGet('milestones') || {}; const activityLog = await redisGet('activityLog') || []; res.json({ milestones, activityLog, updatedAt: new Date().toISOString() }); });
+
+app.get('/status', async (req, res) => {
+  const milestones = await redisGet('milestones') || {};
+  const activityLog = await redisGet('activityLog') || [];
+  res.json({ milestones, activityLog, updatedAt: new Date().toISOString() });
+});
+
 app.post('/slack', async (req, res) => {
   if (!verifySlackRequest(req)) return res.status(401).json({ error: 'Invalid signature' });
   const text = (req.body.text || '').trim();
@@ -69,5 +84,6 @@ app.post('/slack', async (req, res) => {
   redisSetAsync('activityLog', activityLog);
   postToTrackerUpdatesAsync(notifText);
 });
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log('NewKroo tracker backend running on port ' + PORT));
