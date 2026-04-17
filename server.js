@@ -12,7 +12,11 @@ async function redisGet(key) {
     const res = await fetch(REDIS_URL + '/get/' + key, { headers: { Authorization: 'Bearer ' + REDIS_TOKEN } });
     const data = await res.json();
     if (!data.result) return null;
-    return JSON.parse(data.result);
+    const parsed = JSON.parse(data.result);
+    if (parsed && typeof parsed === 'object' && 'value' in parsed && !Array.isArray(parsed)) {
+      return JSON.parse(parsed.value);
+    }
+    return parsed;
   } catch (e) { console.error('Redis GET error:', e.message); return null; }
 }
 
